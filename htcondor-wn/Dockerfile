@@ -1,4 +1,4 @@
-FROM rockylinux:8
+FROM rockylinux:9
 LABEL maintainer="Manuel Giffels <giffels@gmail.com>"
 
 # Create links to point to scratch directory
@@ -13,16 +13,21 @@ RUN ln -s /scratch/etc/condor /etc/condor
 RUN ln -s /scratch/var/log/condor /var/log/condor
 RUN ln -s /scratch/var/lib/condor /var/lib/condor
 RUN ln -s /scratch/etc/cloud /etc/cloud
-RUN ln -s /scratch/var/lock/condor /var/lock/condor
+RUN mkdir /run/lock
+RUN ln -s /scratch/var/lock/condor /run/lock/condor
 RUN ln -s /scratch/var/run/condor /var/run/condor
 
+# Accept SHA1 signature keys for HTCondor Repo signing key
+RUN update-crypto-policies --set DEFAULT:SHA1
+
 RUN rpm --import http://research.cs.wisc.edu/htcondor/yum/RPM-GPG-KEY-HTCondor
-RUN dnf install -y https://research.cs.wisc.edu/htcondor/repo/23.x/el8/x86_64/release/htcondor-release-23.x-1.el8.noarch.rpm
+RUN dnf install -y https://research.cs.wisc.edu/htcondor/repo/24.x/el9/x86_64/release/htcondor-release-24.x-1.el9.noarch.rpm
 
 RUN dnf -y install epel-release && dnf clean all
-RUN dnf config-manager --set-enabled powertools
+RUN dnf config-manager --set-enabled crb
 RUN dnf -y install condor \
-                   python39 \
+                   python3.11 \
+                   python3.11-pip \
                    ansible \
                    apptainer \
                    openssh-server \
@@ -31,12 +36,12 @@ RUN dnf -y install condor \
      && dnf clean all
 
 # Get a newer Git version to use Git Protocol v2
-RUN dnf -y install https://packages.endpointdev.com/rhel/8/main/x86_64/endpoint-repo.noarch.rpm \
+RUN dnf -y install https://packages.endpointdev.com/rhel/9/main/x86_64/endpoint-repo.noarch.rpm \
     && dnf config-manager --disable endpoint \
     && dnf -y install --enablerepo endpoint git \
     && dnf clean all
 
-RUN python3.9 -m pip install --no-cache-dir condor_git_config pexpect
+RUN python3.11 -m pip install --no-cache-dir condor_git_config pexpect
 
 # Add ansible community collection
 RUN ansible-galaxy collection install community.general -p /usr/share/ansible/collections
