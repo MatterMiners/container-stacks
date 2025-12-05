@@ -49,11 +49,11 @@ RUN ansible-galaxy collection install community.general -p /usr/share/ansible/co
 # Add Tini
 ENV TINI_VERSION=v0.19.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
-RUN chmod +rx /tini
+RUN chmod a+rx /tini
 
 COPY ansible_config /srv/ansible_config
 COPY pilot_execute.sh /srv/pilot_execute.sh
-RUN chmod +rx /srv/pilot_execute.sh
+RUN chmod a+rx /srv/pilot_execute.sh
 
 # Tell sshd not to chroot inside the container
 RUN sed -i '/^UsePrivilegeSeparation/{h;s/.*/UsePrivilegeSeparation no/g};${x;/^$/{s//UsePrivilegeSeparation no/;H};x}' /usr/lib64/condor/condor_ssh_to_job_sshd_config_template
