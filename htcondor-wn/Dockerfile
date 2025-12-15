@@ -21,7 +21,7 @@ RUN ln -s /scratch/var/run/condor /var/run/condor
 RUN update-crypto-policies --set DEFAULT:SHA1
 
 RUN rpm --import http://research.cs.wisc.edu/htcondor/yum/RPM-GPG-KEY-HTCondor
-RUN dnf install -y https://research.cs.wisc.edu/htcondor/repo/24.x/el9/x86_64/release/htcondor-release-24.x-1.el9.noarch.rpm
+RUN dnf install -y https://research.cs.wisc.edu/htcondor/repo/25.0/el9/x86_64/release/htcondor-release-25.0-1.el9.noarch.rpm
 
 RUN dnf -y install epel-release && dnf clean all
 RUN dnf config-manager --set-enabled crb
